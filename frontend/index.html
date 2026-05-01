@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国地方戏剧数字传播评价与决策平台</title>
+
+    <!-- 页面全局样式 -->
+    <link rel="stylesheet" href="css/style.css">
+    
+</head>
+<body>
+
+    <!-- 可视化看板主容器 -->
+    <div class="dashboard-wrapper">
+        <!-- 顶部信息栏：统计摘要 + 主标题 + 署名 -->
+        <header>
+            <div class="header-left">
+                <span>已收录剧种: <strong>451 个</strong></span>
+                <span>分析弹幕数量: <strong>64,369 条</strong></span>
+                <span>受众评论抓取: <strong>4204 条</strong></span>
+            </div>
+            <div class="header-center">
+                <h1>
+                    中国地方戏剧数字传播评价与决策平台
+                    <span class="header-subtitle">NLP 与 LLM 双引擎驱动</span>
+                </h1>
+            </div>
+            <div class="header-right">
+                戏韵数联 / 河南大学
+            </div>
+        </header>
+
+        <!-- 左侧图表区 -->
+        <aside class="left-column">
+            <section class="chart-panel">
+                <div class="panel-title">全国剧种数量 Top 10 省份</div>
+                <div class="chart-box" id="chart-left-top"></div>
+            </section>
+            <section class="chart-panel">
+                <div class="panel-title">戏曲现代受众关注点与画像</div>
+                <div class="chart-box" id="chart-left-bottom"></div>
+            </section>
+        </aside>
+
+        <!-- 中央地图区 -->
+        <main class="center-column">
+            <div class="map-box" id="chart-center-map"></div>
+            <div class="map-approval">
+                地图数据来源：高德开放平台 (阿里云 DataV) | 审图号：GS(2025)5996
+            </div>
+        </main>
+
+        <!-- 右侧图表区 -->
+        <aside class="right-column">
+            <section class="chart-panel">
+                <div class="panel-title">剧种核心意象词云</div>
+                <div class="chart-box" id="chart-right-top"></div>
+            </section>
+            <section class="chart-panel">
+                <div class="panel-title">经典剧目情感起伏曲线</div>
+                <div class="chart-box" id="chart-right-bottom"></div>
+            </section>
+        </aside>
+
+        <section class="bottom-column">
+            <div class="hub-stats">
+                <span>已处理: <strong class="cyan-glow">127 条</strong></span>
+                <span>待处理: <strong class="amber-glow">52 条</strong></span>
+            </div>
+
+            <div class="hub-scroller">
+                <div class="scroller-inner">
+                    <div class="log-item pending" data-fulltext="正在加载调度日志..."><span>[待处理]</span> 正在加载调度日志...</div>
+                </div>
+            </div>
+
+            <div class="hub-buttons">
+                <button class="hub-btn">剧种档案</button>
+                <button class="hub-btn">热门视频卡片</button>
+                <button class="hub-btn accent">数据链路</button>
+            </div>
+            <div id="hub-tooltip" class="hub-tooltip"></div>
+        </section>
+
+    </div>
+
+    <!-- 弹窗 1：省份/剧种受众画像（TGI） -->
+    <div id="tgi-modal" class="modal-overlay">
+        <div class="modal-content tgi-modal-content">
+            <span class="modal-close" onclick="closeTgiModal()">&times;</span>
+            <div class="modal-header">
+                <h2><span id="tgi-modal-title">全国</span> - 代表剧种受众具体画像与 TGI 分析</h2>
+            </div>
+            <div class="modal-body">
+                <div class="tgi-charts-container">
+                    <div class="tgi-chart-box">
+                        <div class="tgi-chart-title">年龄分布 & TGI 指数</div>
+                        <div id="tgi-age-chart" style="width: 100%; height: 260px;"></div>
+                    </div>
+                    <div class="tgi-chart-box">
+                        <div class="tgi-chart-title">性别分布 & TGI 指数</div>
+                        <div id="tgi-gender-chart" style="width: 100%; height: 260px;"></div>
+                    </div>
+                </div>
+                <div class="opera-score-tabs-section tgi-analysis-tabs">
+                    <div class="opera-score-tab-nav">
+                        <button type="button" class="opera-score-tab-btn is-active" data-tgi-tab="overview">概况</button>
+                        <button type="button" class="opera-score-tab-btn" data-tgi-tab="insight">解读</button>
+                        <button type="button" class="opera-score-tab-btn" data-tgi-tab="advice">建议</button>
+                    </div>
+                    <div class="opera-score-tab-content">
+                        <div id="tgi-tab-overview" class="opera-score-tab-panel is-active">加载中...</div>
+                        <div id="tgi-tab-insight" class="opera-score-tab-panel">加载中...</div>
+                        <div id="tgi-tab-advice" class="opera-score-tab-panel">加载中...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗 2：剧种详情列表（动态注入内容） -->
+    <div id="opera-list-modal" class="modal-overlay">
+        <div class="modal-content" style="width: 50%; min-width: 600px;">
+            <span class="modal-close" onclick="closeOperaListModal()">&times;</span>
+            <div class="modal-header">
+                <h2>全国剧种智能档案馆 <span id="opera-count-badge" style="font-size:14px; color:#a1b0c8;">(共 451 个)</span></h2>
+                <div class="search-bar-container">
+                    <input type="text" id="opera-search-input" placeholder="输入剧种名、朝代或非遗级别..." oninput="handleOperaSearch()">
+                    <!-- <i class="search-icon">🔍</i> -->
+                </div>
+            </div>
+            <div class="modal-body" id="opera-list-body" style="max-height: 60vh; overflow-y: auto;">
+                </div>
+        </div>
+    </div>
+
+    <!-- 弹窗 3：高能弹幕提取与 AI 解析 -->
+    <div id="danmaku-modal" class="modal-overlay">
+        <div class="modal-content" style="width: 35%; min-width: 450px;"> 
+            <span class="modal-close" onclick="closeDanmakuModal()">&times;</span>
+            <div class="modal-header">
+                <h2>💥 高能弹幕提取 <span style="font-size:14px; color:#a1b0c8;"></span></h2>
+            </div>
+            <div class="modal-body">
+                <div class="nlp-excerpt-box" style="border-left: 4px solid #ff2277; max-height: 35vh; overflow-y: auto; padding-right: 10px; margin-bottom: 15px;" id="danmaku-list-body">
+                    </div>
+                
+                <div id="ai-analysis-trigger" style="text-align: center; margin-top: 15px;">
+                    <button onclick="startDanmakuAIAnalysis()" style="background: linear-gradient(90deg, #0075ff, #00eaff); color: #fff; border: none; padding: 10px 25px; border-radius: 20px; font-size: 15px; cursor: pointer; font-weight: bold; box-shadow: 0 0 15px rgba(0,234,255,0.4); transition: transform 0.2s;">
+                         Qwen 解析
+                    </button>
+                </div>
+
+                <div id="ai-analysis-loading" style="display: none; text-align: center; margin-top: 20px;">
+                    <div style="color: #ffb020; font-size: 15px; letter-spacing: 1px; font-style: italic;">
+                        <span style="display:inline-block; animation: pulse 1s infinite;">正在提取弹幕内容并生成分析...</span>
+                    </div>
+                </div>
+
+                <div id="ai-analysis-result" style="display: none; margin-top: 15px; background: rgba(0, 234, 255, 0.05); border: 1px solid rgba(0, 234, 255, 0.3); border-radius: 8px; padding: 15px;">
+                    <div style="margin-bottom: 12px;">
+                        <span style="color: #00eaff; font-weight: bold; font-size: 16px;"> 分析 (Analysis)：</span>
+                        <div id="danmaku-insight" style="color: #e0e6ed; font-size: 14px; line-height: 1.6; margin-top: 6px; letter-spacing: 1px;"></div>
+                    </div>
+                    <div style="border-top: 1px dashed rgba(255,255,255,0.15); padding-top: 12px;">
+                        <span style="color: #ffb020; font-weight: bold; font-size: 16px;"> 建议 (Advice)：</span>
+                        <div id="danmaku-decision" style="color: #e0e6ed; font-size: 14px; line-height: 1.6; margin-top: 6px; letter-spacing: 1px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗 4：弹幕心理分析 -->
+    <div id="nlp-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeNlpModal()">&times;</span>
+            <div class="modal-header">
+                <h2>🧠 高频弹幕关注点心理分析 <span style="font-size:14px; color:#a1b0c8;">(Qwen-Plus)</span></h2>
+            </div>
+            <div class="modal-body">
+                <div class="nlp-keyword">
+                    核心关键词：<span id="modal-word" style="color:#00eaff; font-size:24px; font-weight:bold; margin-left:10px;">加载中</span>
+                </div>
+                
+                <div class="nlp-metrics">
+                    <div class="metric-box">
+                        <div class="metric-title">情感正向指数 (Score)</div>
+                        <div class="metric-value" id="modal-score">0.00</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-title">情感极性 (Polarity)</div>
+                        <div class="metric-value" id="modal-sentiment" style="font-size: 18px;">分析中</div>
+                    </div>
+                </div>
+
+                <div class="nlp-excerpt">
+                    <div style="color:#a1b0c8; margin-bottom:8px; font-size:13px;">典型语境下 Qwen 解读：</div>
+                    <div class="nlp-excerpt-box" id="modal-excerpt">
+                        正在调取大模型分析数据...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 新增弹窗：全国 剧种数量与平均评分双轴图 -->
+    <div id="opera-score-modal" class="modal-overlay">
+        <div class="modal-content opera-score-modal-content">
+            <span class="modal-close" onclick="closeOperaScoreModal()">&times;</span>
+            <div class="modal-header">
+                <h2><span>全国</span> - 剧种综合传播评分 Top 10 省份分析</h2>
+            </div>
+            <div class="modal-body opera-score-modal-body">
+                <div class="opera-score-chart-section">
+                    <div class="tgi-chart-title">剧种数量 & 平均评分</div>
+                    <div id="modalChart" class="opera-score-chart"></div>
+                </div>
+                <div class="opera-score-tabs-section">
+                    <div class="opera-score-tab-nav">
+                        <button type="button" class="opera-score-tab-btn is-active" data-tab="analysis">分析</button>
+                        <button type="button" class="opera-score-tab-btn" data-tab="examples">示例</button>
+                        <button type="button" class="opera-score-tab-btn" data-tab="advice">建议</button>
+                    </div>
+                    <div class="opera-score-tab-content">
+                        <div id="opera-score-tab-analysis" class="opera-score-tab-panel is-active">加载中...</div>
+                        <div id="opera-score-tab-examples" class="opera-score-tab-panel">加载中...</div>
+                        <div id="opera-score-tab-advice" class="opera-score-tab-panel">加载中...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据链条 -->
+    <div id="link-modal" class="modal-overlay">
+        <div class="modal-content terminal-modal">
+            <span class="modal-close" onclick="closeLinkModal()">&times;</span>
+            <div class="modal-header terminal-header">
+                <h2>数据链条终端</h2>
+                <!-- <div class="terminal-status"><span class="blink-dot"></span> Engine Online</div> -->
+            </div>
+            <div class="modal-body terminal-body">
+                <div id="terminal-output" class="terminal-output">
+                    <div class="log-line sys">Welcome to Opera Data Pipeline Monitor.</div>
+                    <div class="log-line sys">Initializing NLP and LLM Engines... Done.</div>
+                    <div class="log-line sys">Waiting for dispatch tasks...</div>
+                    <div class="log-line">--------------------------------------------------</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 视频卡片 -->
+    <div id="video-card-modal" class="modal-overlay">
+        <div class="modal-content vc-modal-content">
+            <span class="modal-close" onclick="closeVideoCardModal()">&times;</span>
+            
+            <div class="modal-header vc-header">
+                <h2>📺 热门视频全息卡片</h2>
+            </div>
+            
+            <div class="vc-left panel-box vc-panel">
+                
+                <div class="video-placeholder" id="vc-cover">
+                    
+                    <div class="bvid-tag" data-title="按住 Ctrl + 左键 点击跳转 B 站">
+                        <span id="vc-bvid" class="clickable-bvid">BV1p44y1s7z1</span>
+                    </div>
+                </div>
+                
+                <h3 id="vc-title" class="vc-title">大广东请求出战！《原神》x 曾小敏...</h3>
+                
+                <div class="vc-stats">
+                    <div class="stat-box">
+                        <span>播放量:</span><strong id="vc-views" class="cyan-glow">481.5W</strong>
+                    </div>
+                    <div class="stat-box">
+                        <span>点赞数:</span><strong id="vc-likes">48.8W</strong>
+                    </div>
+                    <div class="stat-box">
+                        <span>投币数:</span><strong id="vc-coins">44.2W</strong>
+                    </div>
+                    <div class="stat-box">
+                        <span>收藏数:</span><strong id="vc-favs">16.0W</strong>
+                    </div>
+                </div>
+
+                <div class="vc-tags-area">
+                    <div class="tag-label">Qwen 洞察标签</div>
+                    <div class="keyword-tags" id="vc-tag-container">
+                        </div>
+                </div>
+                
+                <button class="next-video-btn" id="next-video-btn">更换视频卡片</button>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- 省份页左上角详情 -->
+    <div class="ai-diagnostic-modal" id="aiModal">
+    <div class="ai-modal-header">
+        <span class="ai-icon">✨</span> 
+        <span class="ai-title">Qwen 智能分析</span>
+        <span class="ai-badge" id="aiModalBadge">[ 稳步发展型 ]</span>
+    </div>
+
+    <div class="ai-modal-body">
+        <div class="diag-block analysis">
+            <div class="block-title">数据剖析</div>
+            <div class="block-content" id="aiAnalysisText"></div>
+        </div>
+
+        <div class="diag-block advice">
+            <div class="block-title">优化建议</div>
+            <div class="block-content" id="aiAdviceText">
+                </div>
+        </div>
+    </div>
+</div>
+
+    <!-- 加载动画 -->
+    <div class="initial-loader-container">
+        <div class="tech-spinner"></div>
+        <div class="loading-text">DATA LOADING...</div>
+    </div>
+
+    <!-- ECharts 核心库与词云插件 -->
+    <script src="js/echarts.min.js" defer></script>
+    <script src="js/echarts-wordcloud.min.js" defer></script>
+
+    <!-- 页面脚本：数据 -> UI 交互 -> 图表渲染 -> 主流程 -->
+    <script src="js/data.js" defer></script>
+    <script src="js/ui.js" defer></script>
+    <script src="js/charts.js" defer></script>
+    <script src="js/main.js" defer></script>
+    
+</body>
+</html>
