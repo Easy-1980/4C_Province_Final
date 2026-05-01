@@ -50,6 +50,7 @@ DASHSCOPE_API_KEY=你的DashScope Key
 ### 5.3 一键构建分析数据
 
 ```bash
+python dataProcess/dataProcess_Scripts/getData_bilibili.py
 python dataProcess/dataProcess_Scripts/build_all_data.py
 ```
 
@@ -67,21 +68,6 @@ python dataProcess/dataProcess_Scripts/bilibili_tasks.py
 frontend/index.html
 ```
 
-## 6. 数据处理链路
-
-```mermaid
-flowchart LR
-  A["rawData/*.xlsx + rawData/getData_bilibili/*.csv"] --> B["analyze_video.py"]
-  B --> C["video_analysis.json"]
-  A --> D["analyze_dashboard.py"]
-  C --> D
-  D --> E["dashboard_data.json"]
-  A --> F["bilibili_tasks.py"]
-  F --> G["bilibili_tasks.json"]
-  C --> H["frontend/data/video_analysis.json"]
-  E --> I["frontend/data/dashboard_data.json"]
-  G --> J["frontend/data/bilibili_tasks.json"]
-```
 
 ## 7. 项目文件树（含文件说明）
 
@@ -98,7 +84,7 @@ flowchart LR
 │  │  ├─ audiencePortrait.xlsx           # 各省受众画像与 TGI 原始表
 │  │  ├─ bilibili_tasks.xlsx             # B站抓取任务表（bvid/opera/province/status）
 │  │  └─ getData_bilibili/
-│  │     ├─ video_info.csv               # 视频元数据（播放、点赞、投币、收藏、弹幕总数等）
+│  │     ├─ video_info.csv               # 视频基础数据（播放、点赞、投币、收藏、弹幕总数等）
 │  │     ├─ comments_data.csv            # 评论明细（采样评论文本）
 │  │     └─ danmaku_data.csv             # 弹幕明细（时间点 + 文本）
 │  └─ dataProcess_Scripts/
@@ -325,34 +311,5 @@ TGI 数据直接来自表中字段，代码只做聚合与 AI 解读，不重新
 
 如需刷新前端展示，需确保 `frontend/data/` 下 JSON 与最新分析结果一致。
 
-## 12. 口径与限制说明
 
-- 所有评分/指数均为“同批样本内相对指标”，不能外推为行业绝对标准。
-- 评论数据是采样文本，不能等同于真实评论总量。
-- 省份视频数是当前样本覆盖量，不代表真实内容供给规模。
-- 词云和情感分析受分词词典、停用词表、采样窗口影响。
-
-## 13. 常见问题（FAQ）
-
-### 13.1 为什么有时 AI 文案是 fallback？
-
-通常是 API Key 缺失、接口失败或返回内容非 JSON。代码会自动降级，保证流程不中断。
-
-### 13.2 为什么同一视频在不同批次分层可能变化？
-
-分层阈值来自当前批次分位数（33%/66%），样本池变化会导致阈值变化。
-
-### 13.3 前端打开后没有数据怎么办？
-
-优先检查：
-- `frontend/data/*.json` 是否存在且字段完整。
-- 浏览器控制台是否报 JSON 路径错误。
-- 是否将新输出同步到 `frontend/data/`。
-
-## 14. 后续可扩展方向
-
-- 增加时间序列分析（按抓取时间对比趋势）。
-- 增加多平台数据源（不只 B 站）。
-- 增加自动化调度与增量更新管道。
-- 增加单元测试与数据校验规则（schema/质量门禁）。
 
