@@ -1,0 +1,1303 @@
+/* 全局 CSS 变量定义 (方便统一调整尺寸、颜色、间距) */
+:root {
+    /* 颜色系统：深蓝科技风 */
+    --bg-main: #060d1f;           /* 整体页面深色背景 */
+    --bg-panel: rgba(10, 25, 50, 0.6); /* 两侧面板的半透明背景 */
+    --border-panel: #1a3c75;      /* 面板边框颜色 */
+    --text-main: #e0e6ed;         /* 主文字颜色 */
+    --text-highlight: #00eaff;    /* 高亮标题颜色 (青蓝色) */
+    
+    /* 尺寸与间距系统 */
+    --header-height: 5%;         /* 顶部导航栏高度 */
+    --gap-main: 15px;             /* 宏观网格间距 */
+    --gap-panel: 15px;            /* 面板内部 Flex 间距 */
+    --padding-main: 15px;         /* 整个大屏的内边距 */
+    --padding-panel: 15px;        /* 每个小模块的内边距 */
+    --side-width: 25%;            /* 左右两侧面板宽度占比 */
+}
+
+/* 基础样式重置 */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body, html { width: 100%; height: 100%; overflow: hidden; background-color: var(--bg-main); color: var(--text-main); font-family: "Microsoft YaHei", sans-serif; }
+
+/* 2. CSS Grid 主布局 (严格遵照 grid-template-areas) */
+.dashboard-wrapper {
+    display: grid;
+    width: 100vw;
+    height: 100vh;
+    padding: var(--padding-main);
+    gap: var(--gap-main);
+    /* 定义列宽：左25% 中间自适应 右25% */
+    grid-template-columns: var(--side-width) 1fr var(--side-width);
+    
+    /* 【核心修改点】定义三层行高：头部 10% | 中间自适应 | 底部固定 80px */
+    grid-template-rows: var(--header-height) 1fr 45px;
+    
+    /* 【核心修改点】矩阵排版法：把中间列的最下面分给 bottom */
+    grid-template-areas:
+        "header header header"
+        "left center right"
+        "left bottom right";
+}
+
+/* 区域映射 */
+header { grid-area: header; }
+aside.left-column { grid-area: left; }
+main.center-column { grid-area: center; }
+aside.right-column { grid-area: right; }
+
+/* 3. 模块内部 Flexbox 排版 & 科技感边框样式 */
+/* 顶部 Header 排版 (左右两侧对称，主标题绝对居中，且不受两侧内容影响) */
+header {
+    display: flex;
+    align-items: center; /* 确保垂直居中 */
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=') repeat-x bottom;
+    border-bottom: 2px solid var(--border-panel);
+    padding: 0 20px;
+}
+
+/* 左侧区域：占满剩余空间的一半，内容靠左对齐 */
+.header-left { 
+    flex: 1; 
+    display: flex; 
+    align-items: center; /* 确保这行字本身也垂直居中 */
+    justify-content: flex-start; 
+    gap: 12px; /* 【缩小间距】从 15px 缩小到 12px */
+    font-size: 10px; /* 【缩小字号】从 12px 缩小到 11px */
+    color: rgba(224, 230, 237, 0.6); 
+    white-space: nowrap; /* 强制绝对不换行，哪怕溢出也排在一行 */
+}
+
+.header-left span strong { 
+    color: var(--text-highlight); 
+    font-size: 13px; /* 【缩小数据字号】从 15px 缩小到 13px */
+    margin-left: 3px; 
+    font-weight: normal; 
+}
+
+/* 中间区域：失去伸缩性，由内容撑开，保证绝对居中 */
+.header-center { 
+    flex: none; 
+    text-align: center; 
+    transform: translateY(-4px); /* 【视觉微调】向上偏移2像素，抵消底部边框带来的“偏下”错觉 */
+}
+
+/* 修改主标题，让它成为副标题的定位基准 (父相) */
+.header-center h1 { 
+    font-size: 28px; /* 字号可以稍微调回大一点点 */
+    line-height: 1; 
+    color: var(--text-highlight); 
+    letter-spacing: 2px; 
+    text-shadow: 0 0 12px rgba(0, 234, 255, 0.8); 
+    margin: 0;
+    
+    position: relative; 
+    display: inline-block; 
+}
+
+/* 副标题，悬浮在右下方 */
+.header-subtitle {
+    position: absolute; 
+    
+    /* 靠右下方对齐：贴着 h1 的右边缘，再往右推 10px */
+    left: 100%; 
+    margin-left: 8px; 
+    bottom: -2px; /* 和主标题的底部基线对齐 */
+    
+    /* 科技感徽章样式 */
+    font-size: 11px;
+    color: #ffb020; 
+    letter-spacing: 1px;
+    font-weight: normal;
+    text-shadow: 0 0 8px rgba(255, 176, 32, 0.5);
+    white-space: nowrap; /* 强制不换行 */
+    
+    /* 可选：加一个淡淡的边框，看起来像高科技标签 */
+    border: 1px solid rgba(255, 176, 32, 0.3);
+    background: rgba(255, 176, 32, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    transform: skewX(-10deg); 
+}
+
+/* 右侧区域：占满剩余空间的一半，内容靠右对齐 */
+.header-right { 
+    flex: 1; 
+    display: flex; 
+    align-items: center;
+    justify-content: flex-end; 
+    font-size: 12px; 
+    color: rgba(224, 230, 237, 0.5); 
+    font-weight: normal; 
+    letter-spacing: 1px;
+    white-space: nowrap; /* 右侧也强制不换行，保持队形 */
+}
+
+/* 左右两侧栏内部排版 (上下两个模块均分) */
+aside.left-column, aside.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-panel);
+}
+
+/* 统一的图表承载面板样式 (带科技感四角边框效果) */
+section.chart-panel {
+    flex: 1; /* 均分上下高度 */
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-panel);
+    padding: var(--padding-panel);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+/* 模拟截图中的科技感装饰角 */
+section.chart-panel::before, section.chart-panel::after {
+    content: ''; position: absolute; width: 15px; height: 15px; pointer-events: none;
+}
+section.chart-panel::before { top: -1px; left: -1px; border-top: 2px solid var(--text-highlight); border-left: 2px solid var(--text-highlight); }
+section.chart-panel::after { bottom: -1px; right: -1px; border-bottom: 2px solid var(--text-highlight); border-right: 2px solid var(--text-highlight); }
+
+/* 面板标题 */
+.panel-title { font-size: 16px; color: #fff; margin-bottom: 10px; text-align: center; font-weight: bold; }
+/* 图表真实渲染区 */
+.chart-box { flex: 1; width: 100%; height: 100%; }
+
+/* 中间地图主控台排版 */
+main.center-column {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle, rgba(10,25,50,0.8) 0%, rgba(6,13,31,1) 100%);
+    border: 1px solid var(--border-panel);
+}
+.map-box { width: 100%; height: 100%; }
+
+/* 绝对定位的合规地图声明 */
+.map-approval {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+}
+
+
+/* NLP 情感分析全屏弹窗 (最高优先级 z-index) */
+.modal-overlay {
+    display: none; /* 默认隐藏 */
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(6, 13, 31, 0.85); /* 半透明深色遮罩 */
+    backdrop-filter: blur(8px); /* 科技感毛玻璃效果 */
+    z-index: 99999; /* 绝对最高层级，遮挡一切 */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, rgba(10, 25, 50, 0.95), rgba(6, 13, 31, 0.95));
+    border: 2px solid var(--text-highlight);
+    box-shadow: 0 0 40px rgba(0, 234, 255, 0.2);
+    border-radius: 10px;
+    width: 40%;
+    min-width: 400px;
+    padding: 30px;
+    position: relative;
+    animation: modalFadeIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); /* 弹簧动画 */
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-close {
+    position: absolute; top: 15px; right: 20px;
+    color: #a1b0c8; font-size: 28px; font-weight: bold;
+    cursor: pointer; transition: color 0.2s;
+}
+.modal-close:hover { color: #ff4d4f; }
+
+.modal-header h2 {
+    color: #fff; margin-bottom: 25px; font-size: 22px;
+    border-bottom: 1px solid rgba(0, 234, 255, 0.3); padding-bottom: 15px;
+}
+.modal-header h2 span { color: var(--text-highlight); font-size: 26px; margin-left: 10px; text-shadow: 0 0 10px rgba(0,234,255,0.5); }
+
+.nlp-score-box {
+    display: flex; flex-direction: column; align-items: center;
+    background: rgba(0, 234, 255, 0.05);
+    border: 1px solid rgba(0, 234, 255, 0.2);
+    border-radius: 8px; padding: 25px; margin-bottom: 20px;
+}
+.score-title { color: #a1b0c8; font-size: 14px; margin-bottom: 10px; }
+.score-value { font-size: 55px; font-weight: bold; color: #00eaff; text-shadow: 0 0 15px rgba(0,234,255,0.5); line-height: 1; margin-bottom: 10px; }
+.score-tag { font-size: 14px; color: #ffb020; border: 1px solid #ffb020; padding: 4px 12px; border-radius: 15px; }
+
+.nlp-excerpt-box {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 4px solid var(--text-highlight);
+    padding: 20px; border-radius: 0 8px 8px 0;
+}
+.excerpt-title { color: #fff; font-size: 16px; margin-bottom: 12px; font-weight: bold; }
+.excerpt-text { color: #e0e6ed; font-size: 15px; line-height: 1.8; font-style: italic; letter-spacing: 1px; }
+
+/* TGI 弹窗专属样式 */
+.tgi-modal-content { width: 65%; min-width: 800px; } /* TGI弹窗需要宽一点放两张图 */
+.tgi-charts-container { display: flex; gap: 20px; width: 100%; }
+.tgi-chart-box { 
+    flex: 1; 
+    background: rgba(0, 234, 255, 0.03); 
+    border: 1px solid rgba(0, 234, 255, 0.15); 
+    border-radius: 8px; padding: 15px; 
+}
+.tgi-chart-title { text-align: center; color: #fff; font-size: 15px; font-weight: bold; margin-bottom: 5px; }
+
+/* 全国热度 Top10 弹窗专属样式 */
+#opera-score-modal .opera-score-modal-content {
+    width: 56%;
+    min-width: 760px;
+    height: 76vh;
+    background: rgba(6, 13, 31, 0.95);
+    border: 1px solid #00eaff;
+    box-shadow: 0 0 36px rgba(0, 234, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+#opera-score-modal .opera-score-modal-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+#opera-score-modal .opera-score-chart-section {
+    flex: 0 0 60%;
+    min-height: 0;
+    width: 94%;
+    margin: 0 auto;
+    background: rgba(0, 234, 255, 0.03);
+    border: 1px solid rgba(0, 234, 255, 0.18);
+    border-radius: 8px;
+    padding: 14px;
+}
+
+#opera-score-modal .opera-score-chart {
+    width: 100%;
+    height: calc(100% - 24px);
+    margin: 0 auto;
+}
+
+#opera-score-modal .opera-score-tabs-section {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    width: 94%;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+#opera-score-modal .opera-score-tab-nav {
+    display: flex;
+    gap: 30px; /* 间距拉大，更大气 */
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* 增加一条底部的暗色轨道线 */
+}
+
+#opera-score-modal .opera-score-tab-btn {
+    background: transparent;
+    border: none; /* 去除原来的全包围边框 */
+    border-bottom: 2px solid transparent; /* 预留底部边框防跳动 */
+    color: #8b9baf;
+    padding: 8px 4px; /* 调整内边距适应下划线风格 */
+    border-radius: 0; /* 移除圆角 */
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    transition: all 0.24s ease;
+}
+
+#opera-score-modal .opera-score-tab-btn:hover {
+    color: #c0d0e0; /* 悬浮稍微提亮文字 */
+}
+
+#opera-score-modal .opera-score-tab-btn.is-active {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #00eaff; /* 激活时底部亮线 */
+    color: #00eaff;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(0, 234, 255, 0.5); /* 文字青色发光 */
+    box-shadow: 0 4px 10px -6px #00eaff; /* 底部下划线微弱发光 */
+}
+
+#opera-score-modal .opera-score-tab-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    max-height: calc(100% - 52px);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 234, 255, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#opera-score-modal .opera-score-tab-panel {
+    display: none;
+    color: #e0e6ed;
+    font-size: 15px;
+    line-height: 1.8;
+    font-style: italic;
+    letter-spacing: 1px;
+    padding: 12px 10px 12px 16px;
+    border-left: 3px solid #00eaff;
+}
+
+#opera-score-modal .opera-score-tab-panel.is-active {
+    display: block;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 234, 255, 0.75) rgba(8, 24, 52, 0.85);
+    animation: operaScorePanelIn 0.26s ease;
+}
+
+@keyframes operaScorePanelIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#opera-score-modal .opera-score-tab-panel.is-active::-webkit-scrollbar { width: 6px; }
+#opera-score-modal .opera-score-tab-panel.is-active::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.15); 
+    border-radius: 4px;
+}
+#opera-score-modal .opera-score-tab-panel.is-active::-webkit-scrollbar-thumb {
+    background: rgba(0, 234, 255, 0.4); 
+    border-radius: 4px;
+    box-shadow: inset 0 0 6px rgba(0, 234, 255, 0.2);
+}
+#opera-score-modal .opera-score-tab-panel.is-active::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 234, 255, 0.8);
+}
+
+#opera-score-modal .modal-header h2 span {
+    margin-left: 0;
+}
+
+@media (max-width: 1200px) {
+    #opera-score-modal .opera-score-modal-content {
+        width: 84%;
+        min-width: 0;
+        height: 82vh;
+    }
+
+    #opera-score-modal .opera-score-tab-nav {
+        flex-wrap: wrap;
+    }
+}
+
+/* TGI 弹窗：相关分析 Tab（复用全国热度弹窗样式） */
+#tgi-modal .tgi-analysis-tabs {
+    margin-top: 20px;
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#tgi-modal .opera-score-tab-nav {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#tgi-modal .opera-score-tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #8b9baf;
+    padding: 8px 4px;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    transition: all 0.24s ease;
+}
+
+#tgi-modal .opera-score-tab-btn:hover {
+    color: #c0d0e0;
+}
+
+#tgi-modal .opera-score-tab-btn.is-active {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #00eaff;
+    color: #00eaff;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(0, 234, 255, 0.5);
+    box-shadow: 0 4px 10px -6px #00eaff;
+}
+
+#tgi-modal .opera-score-tab-content {
+    height: auto;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 234, 255, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#tgi-modal .opera-score-tab-panel {
+    display: none;
+    color: #e0e6ed;
+    font-size: 15px;
+    line-height: 1.8;
+    font-style: italic;
+    letter-spacing: 1px;
+    padding: 12px 10px 12px 16px;
+    border-left: 3px solid #00eaff;
+}
+
+#tgi-modal .opera-score-tab-panel.is-active {
+    display: block;
+    height: auto;
+    max-height: 26vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 234, 255, 0.75) rgba(8, 24, 52, 0.85);
+    animation: operaScorePanelIn 0.26s ease;
+}
+
+#tgi-modal .opera-score-tab-panel.is-active::-webkit-scrollbar { width: 8px; }
+#tgi-modal .opera-score-tab-panel.is-active::-webkit-scrollbar-track {
+    background: rgba(8, 24, 52, 0.85);
+    border-radius: 6px;
+    border: 1px solid rgba(0, 234, 255, 0.12);
+}
+#tgi-modal .opera-score-tab-panel.is-active::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(0, 234, 255, 0.62), rgba(0, 117, 255, 0.62));
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgba(0, 234, 255, 0.2);
+}
+#tgi-modal .opera-score-tab-panel.is-active::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(0, 234, 255, 0.85), rgba(0, 117, 255, 0.85));
+}
+
+/* 剧种档案馆弹窗专属样式 */
+.opera-list-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 15px; border-bottom: 1px solid rgba(0, 234, 255, 0.15);
+    transition: background 0.2s;
+}
+.opera-list-item:hover { background: rgba(0, 234, 255, 0.08); }
+.opera-list-left { display: flex; align-items: center; }
+.opera-index {
+    width: 24px; height: 24px; background: #0075ff; color: #fff; text-align: center; 
+    line-height: 24px; border-radius: 50%; font-size: 12px; margin-right: 12px; flex-shrink: 0;
+}
+.opera-name { font-size: 16px; color: #fff; font-weight: bold; margin-right: 10px; }
+.opera-time { font-size: 14px; color: #a1b0c8; }
+.opera-list-right { border: 1px solid; padding: 2px 8px; border-radius: 4px; font-size: 12px; flex-shrink: 0; }
+
+/* 炫酷科技感滚动条 */
+#opera-list-body::-webkit-scrollbar { width: 6px; }
+#opera-list-body::-webkit-scrollbar-track { background: rgba(0, 234, 255, 0.05); border-radius: 3px; }
+#opera-list-body::-webkit-scrollbar-thumb { background: rgba(0, 234, 255, 0.3); border-radius: 3px; }
+#opera-list-body::-webkit-scrollbar-thumb:hover { background: rgba(0, 234, 255, 0.6); }
+
+/* 弹幕弹窗专属：赛博粉高光滚动条 */
+#danmaku-list-body::-webkit-scrollbar { 
+    width: 6px; /* 滚动条宽度，细一点更精致 */
+}
+
+#danmaku-list-body::-webkit-scrollbar-track { 
+    background: rgba(255, 34, 119, 0.05); /* 极淡的粉色轨道背景 */
+    border-radius: 3px; 
+}
+
+#danmaku-list-body::-webkit-scrollbar-thumb { 
+    background: rgba(255, 34, 119, 0.4); /* 半透明的粉色滑块 */
+    border-radius: 3px; 
+}
+
+#danmaku-list-body::-webkit-scrollbar-thumb:hover { 
+    background: rgba(255, 34, 119, 0.8); /* 鼠标悬浮时颜色加深，发光变亮 */
+    box-shadow: 0 0 10px rgba(255, 34, 119, 0.5); /* 加一点外发光效果 */
+}
+
+.nlp-keyword {
+    background: linear-gradient(90deg, rgba(0, 234, 255, 0.15) 0%, rgba(0, 234, 255, 0) 100%);
+    border-left: 4px solid #00eaff;
+    padding: 15px 20px;
+    font-size: 16px;
+    color: #fff;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+#modal-word {
+    text-shadow: 0 0 10px rgba(0, 234, 255, 0.8);
+    letter-spacing: 2px;
+}
+
+/* 数据面板区：双栏并排的仪表盘风格 */
+.nlp-metrics {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px; /* 两个数据盒子的间距 */
+    margin-bottom: 20px;
+}
+
+.metric-box {
+    flex: 1; /* 平分宽度 */
+    background: rgba(6, 13, 31, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* 给数据盒子加一个微弱的顶部反光边缘 */
+.metric-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+.metric-box:hover {
+    border-color: rgba(0, 234, 255, 0.4);
+    box-shadow: 0 5px 15px rgba(0, 234, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.metric-title {
+    font-size: 12px;
+    color: #a1b0c8;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.metric-value {
+    font-size: 26px;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace; /* 使用等宽字体 */
+}
+
+/* 3. AI 深度解析文本框 */
+.nlp-excerpt-box {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px dashed rgba(161, 176, 200, 0.3);
+    border-radius: 6px;
+    padding: 15px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #e0e6ed;
+    text-align: justify;
+    letter-spacing: 1px;
+}
+
+/* 高亮 AI 洞察里的关键字  */
+.nlp-excerpt-box strong {
+    color: #ffb020;
+    font-weight: bold;
+}
+/* 弹幕 AI 分析中的文字呼吸动画 */
+@keyframes pulse {
+    0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } 
+}
+
+/* 加载动画 */
+/* 让 Loading 充满全屏、强制浮在最上层 */
+.initial-loader-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed; 
+  top: 0;          
+  left: 0;       
+  height: 100vh;
+  width: 100vw;
+  background-color: #050a15; 
+  z-index: 9999;   
+  transition: opacity 0.5s ease; 
+}
+    
+.tech-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0, 255, 255, 0.1); 
+    border-radius: 50%;
+    border-top-color: #00ffff; 
+    animation: spin 1s ease-in-out infinite;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4); 
+}
+
+/* 简单的加载文字（可选） */
+.loading-text {
+    margin-top: 20px;
+    color: #00ffff;
+    font-size: 14px;
+    font-family: sans-serif;
+    letter-spacing: 2px;
+    animation: pulse 1.5s infinite;
+}
+
+/* 旋转动画 */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 文字呼吸灯动画 */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* --- AI 诊断悬浮弹窗核心样式 --- */
+.ai-diagnostic-modal {
+    width: 420px; 
+    background: rgba(6, 13, 31, 0.95);
+    border: 1px solid rgba(0, 234, 255, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 234, 255, 0.15);
+    padding: 20px;
+    
+    /* 悬浮核心属性 */
+    position: fixed; 
+    z-index: 9999;
+    display: none; /* 默认隐藏 */
+}
+
+/* 弹出时的动画特效 */
+.ai-diagnostic-modal.show-tooltip {
+    display: block;
+    animation: tooltipPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes tooltipPop {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 内部排版样式 */
+.ai-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 234, 255, 0.15);
+    padding-bottom: 12px;
+}
+
+.ai-icon {
+    font-size: 16px;
+    color: #00eaff;
+    text-shadow: 0 0 8px #00eaff;
+}
+
+.ai-title {
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.ai-badge {
+    margin-left: auto;
+    color: #00eaff;
+    font-size: 13px;
+    background: rgba(0, 234, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 234, 255, 0.4);
+}
+
+/* 内部区块通用样式（现在两者都统一使用了左边框和科技渐变背景） */
+.diag-block {
+    margin-bottom: 15px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    /* 统一使用科技感渐变背景 */
+    background: linear-gradient(135deg, rgba(0, 234, 255, 0.08) 0%, rgba(0, 234, 255, 0.01) 100%);
+    /* 统一加上高亮的青色左边框 */
+    border-left: 3px solid #00eaff;
+}
+
+.diag-block:last-child {
+    margin-bottom: 0;
+}
+
+.block-title {
+    color: #00eaff;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.block-content {
+    color: #c0d0e0;
+    font-size: 13.5px;
+    line-height: 1.7;
+    text-align: justify;
+}
+
+
+
+/* 匹配 JS 动态生成的数字高亮 */
+.num-highlight {
+    color: #00eaff;
+    font-weight: bold;
+    font-size: 14px;
+    margin: 0 2px;
+}
+
+
+/* =========================================
+   新增：数据调度底座 (Data Dispatch Hub) - 极简悬浮版
+========================================= */
+.bottom-column {
+    grid-area: bottom;
+    background: rgba(6, 13, 31, 0.85); /* 颜色改深一点，和地图更融洽 */
+    border: 1px solid rgba(0, 234, 255, 0.2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center; 
+    justify-content: space-between;
+    padding: 0 15px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* 加一点外阴影产生悬浮感 */
+}
+
+/* --- 1. 左侧统计区：完全对齐 header-left 风格 --- */
+.hub-stats {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* 稍微拉开两个统计项的距离 */
+    
+    /* 核心对齐参数 */
+    font-size: 11px; 
+    color: rgba(224, 230, 237, 0.6); 
+    white-space: nowrap;
+    
+    padding-right: 15px;
+    /* border-right: 1px dashed rgba(0, 234, 255, 0.3); */
+}
+
+/* 对齐 header-left span strong 的样式 */
+.hub-stats span strong {
+    font-size: 13px;
+    margin-left: 5px; /* 给文字和数字之间留点呼吸空间 */
+    font-weight: normal; /* header 里是 normal，我们也保持一致 */
+}
+
+/* 保持发光颜色，但稍微微调阴影使其更精致 */
+.cyan-glow { 
+    color: var(--text-highlight); 
+    text-shadow: 0 0 8px rgba(0, 234, 255, 0.5); 
+}
+.amber-glow { 
+    color: #ffb020; 
+    text-shadow: 0 0 8px rgba(255, 176, 32, 0.5); 
+}
+
+/* --- 2. 中间滚动日志区：拉宽、绝对单行防截断 --- */
+.hub-scroller {
+    flex: 1; 
+    height: 28px; /* 压扁内部黑框 */
+    margin: 0 10px; /* 增加左右间距，让它不那么拥挤 */
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 234, 255, 0.1);
+    border-radius: 4px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center; /* 绝对垂直居中 */
+    overflow: hidden;
+}
+.scroller-inner {
+    width: 100%;
+}
+.log-item {
+    font-size: 13px;
+    line-height: 28px;
+    font-family: Consolas, Monaco, monospace;
+    letter-spacing: 0.5px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; /* 超长变成省略号 */
+    cursor: crosshair; /* 鼠标放上去变成科技感准星 */
+    position: relative; /* 为 Tooltip 定位做准备 */
+}
+.log-item span { font-weight: bold; margin-right: 8px; }
+.log-item.processed { color: rgba(0, 234, 255, 0.7); }
+.log-item.pending { color: rgba(255, 176, 32, 0.7); }
+
+/* ✨ 核心功能：独立悬浮 Tooltip ✨ */
+.hub-tooltip {
+    position: absolute;
+    /* 定位在底座的上方居中 */
+    bottom: 65px; 
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(6, 13, 31, 0.95);
+    border: 1px solid #00eaff;
+    color: #e0e6ed;
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 0 20px rgba(0, 234, 255, 0.25);
+    pointer-events: none; /* 防止挡住鼠标操作 */
+    z-index: 99999; /* 保证在最最上层 */
+    
+    /* 默认隐藏，配合 JS 控制 */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28); /* 科技感弹性动画 */
+}
+
+
+/* 当 JS 加上 show 类名时显示 */
+.hub-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    bottom: 55px; /* 配合动画往下微降，产生浮出效果 */
+}
+
+/* --- 3. 右侧交互按钮区 --- */
+.hub-buttons {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 缩小按钮间距 */
+}
+.hub-btn {
+    background: rgba(0, 234, 255, 0.05);
+    border: 1px solid rgba(0, 234, 255, 0.3);
+    color: #a1b0c8;
+    padding: 5px 12px; /* 压扁按钮 */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+}
+.hub-btn:hover {
+    background: rgba(0, 234, 255, 0.2);
+    border-color: #00eaff;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
+}
+.hub-btn.accent {
+    border-color: rgba(255, 176, 32, 0.4);
+    color: #ffb020;
+}
+.hub-btn.accent:hover {
+    background: rgba(255, 176, 32, 0.2);
+    border-color: #ffb020;
+    box-shadow: 0 0 10px rgba(255, 176, 32, 0.3);
+}
+
+/* 搜索框容器 */
+.search-bar-container {
+    margin-top: 15px;
+    position: relative;
+    width: 100%;
+}
+
+#opera-search-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 234, 255, 0.4);
+    border-radius: 20px;
+    padding: 10px 45px 10px 20px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+#opera-search-input:focus {
+    border-color: #00eaff;
+    box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
+}
+
+.search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #00eaff;
+    pointer-events: none;
+}
+
+/* 列表项样式调整，对齐你图片中的布局 */
+.opera-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.opera-info-main {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.opera-dynasty {
+    color: rgba(161, 176, 200, 0.6);
+    font-size: 13px;
+    margin-left: 8px;
+}
+
+.heritage-tag {
+    border: 1px solid #ff2277;
+    color: #ff2277;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* =========================================
+   数据链路：硬核终端弹窗专属样式
+========================================= */
+.terminal-modal {
+    width: 50%;
+    min-width: 600px;
+    background: rgba(5, 10, 15, 0.95); /* 更暗的背景 */
+    border: 1px solid #00eaff;
+    box-shadow: 0 0 30px rgba(0, 234, 255, 0.15);
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed rgba(0, 234, 255, 0.3);
+    padding-bottom: 10px;
+}
+
+.terminal-header h2 {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+    margin: 0;
+    color: #00eaff;
+    border-bottom: none; 
+    padding-bottom: 0; /* 如果文字下方有空隙，把 padding 也清零 */
+}
+
+.blink-dot {
+    width: 8px; height: 8px;
+    background-color: #00ffaa;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+    box-shadow: 0 0 8px #00ffaa;
+}
+@keyframes blink { 50% { opacity: 0.3; } }
+
+.terminal-body {
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 15px;
+    height: 50vh; /* 固定高度，内部滚动 */
+    overflow-y: auto;
+}
+
+/* 终端滚动条 */
+.terminal-body::-webkit-scrollbar { width: 6px; }
+.terminal-body::-webkit-scrollbar-track { background: #000; }
+.terminal-body::-webkit-scrollbar-thumb { background: rgba(0, 234, 255, 0.4); border-radius: 3px; }
+
+.terminal-output {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* 每一行日志的基础样式 */
+.log-line {
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #a1b0c8;
+    word-break: break-all;
+}
+
+/* 不同标签的颜色高亮 */
+.log-line .time { color: #5c6e8a; margin-right: 10px; }
+.log-line .tag-sniff { color: #ffb020; font-weight: bold; } /* 嗅探：琥珀色 */
+.log-line .tag-nlp { color: #00eaff; font-weight: bold; }   /* NLP：青色 */
+.log-line .tag-llm { color: #b142ff; font-weight: bold; }   /* LLM：紫色 */
+.log-line .tag-success { color: #00ffaa; font-weight: bold; text-shadow: 0 0 5px #00ffaa; } /* 成功：亮绿 */
+.log-line.sys { color: #00ffaa; opacity: 0.8; }
+
+/* =========================================
+   热门视频卡片专属样式 (解耦纯净版)
+========================================= */
+
+/* 弹窗外框调整 (移除原来的红色边框设定) */
+.vc-modal-content {
+    width: 420px;
+    padding: 20px;
+}
+
+/* 头部样式 */
+.vc-header {
+    border-bottom: none;
+    padding-bottom: 5px;
+}
+.vc-header h2 {
+    color: #ff2a6d;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* 核心面板去背景与边框 */
+.vc-panel {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin-top: 10px;
+}
+
+/* 封面区 */
+.video-placeholder {
+    background-image: url('images/covers/default.jpg'); /* 默认底图，JS加载完后会被替换 */
+    background-size: cover;
+    background-position: center;
+    height: 180px;
+    position: relative;
+    border: 1px solid rgba(255, 42, 109, 0.3);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+
+/* BVID 容器定位优化 */
+.bvid-tag {
+    position: absolute;
+    top: 4px;   /* 紧靠右上角 */
+    right: 4px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+}
+
+/* 2. 绘制提示框主体 (使用 ::after 读取 data-title 的文字) */
+.bvid-tag::after {
+    content: attr(data-title); /* 魔法：自动读取 HTML 里的文字 */
+    position: absolute;
+    top: calc(100% + 10px); /* 定位在 ID 标签的正下方偏下一点 */
+    right: 0; /* 右对齐，防止超出卡片右边缘 */
+    
+    background: rgba(5, 10, 15, 0.95); /* 深邃的背景色 */
+    border: 1px solid #00eaff; /* 青色科技边框 */
+    color: #00eaff;
+    font-size: 12px;
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 6px 10px;
+    border-radius: 4px;
+    white-space: nowrap; /* 强制文字不换行 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 234, 255, 0.2);
+    
+    /* 默认隐藏，且带有一点向下偏移，为 Hover 动画做准备 */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(5px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* 带有弹性效果的动画 */
+    z-index: 100;
+    pointer-events: none; /* 防止遮挡鼠标点击 */
+}
+
+/* 3. 绘制朝上的小三角指针 (使用 ::before) */
+.bvid-tag::before {
+    content: '';
+    position: absolute;
+    top: calc(100% + 4px); /* 卡在标签和提示框中间 */
+    right: 20px; /* 小三角的位置 */
+    
+    /* 用边框画出向上的三角形 */
+    border-width: 0 6px 6px 6px;
+    border-style: solid;
+    border-color: transparent transparent #00eaff transparent;
+    
+    /* 同样默认隐藏 */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(5px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 100;
+    pointer-events: none;
+}
+
+/* 4. Hover 触发显示与向上浮现动画 */
+.bvid-tag:hover::after,
+.bvid-tag:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0); /* 归位，形成微微向上弹出的感觉 */
+}
+
+/* BVID 点击交互（未 Hover 时，浅灰色） */
+.clickable-bvid {
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    text-decoration: underline dashed rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.794);
+    transition: all 0.2s ease;
+}
+
+/* BVID 点击交互（Hover 时变为青色） */
+.clickable-bvid:hover {
+    color: #00eaff;
+    text-decoration: underline dashed #00eaff;
+    text-shadow: 0 0 8px rgba(0, 234, 255, 0.6);
+}
+
+/* 标题 */
+.vc-title {
+    font-size: 16px;
+    color: #fff;
+    margin: 0 0 15px 0;
+    line-height: 1.4;
+}
+
+/* 2x2 数据网格 */
+.vc-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+/* --- 基础数据框样式（新增平滑过渡和透明边框） --- */
+.stat-box {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 8px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid transparent; /* 提前占位，防止 hover 时边框挤压导致抖动 */
+    transition: all 0.3s ease; /* 让整体变化丝滑 */
+    cursor: default; /* 因为不能点击，保持默认指针，但保留悬浮动画 */
+}
+
+/* 内部文字也加上过渡效果 */
+.stat-box span {
+    font-size: 12px;
+    color: #8b9baf;
+    transition: color 0.3s ease;
+}
+.stat-box strong {
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+/* =========================================
+   新增：数据框 Hover 联动高亮特效
+========================================= */
+
+/* 1. 整个框体上浮 + 泛出青色光晕 */
+.stat-box:hover {
+    background: rgba(0, 234, 255, 0.05); /* 背景微微泛出青色 */
+    border-color: rgba(0, 234, 255, 0.3); /* 浮现淡淡的青色边框 */
+    transform: translateY(-2px); /* 物理悬浮感 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 234, 255, 0.15); /* 底部阴影 + 科技外发光 */
+}
+
+/* 2. 左侧的“播放/点赞”文字提亮 */
+.stat-box:hover span {
+    color: #e0e6ed; 
+}
+
+/* 3. 右侧的数字变身“电光青”并散发光芒 */
+.stat-box:hover strong {
+    color: #00eaff;
+    text-shadow: 0 0 8px rgba(0, 234, 255, 0.6); 
+}
+
+/* 标签区 */
+.vc-tags-area {
+    margin-top: 15px;
+    padding: 10px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+.tag-label {
+    font-size: 12px;
+    color: #5c6e8a;
+    margin-bottom: 8px;
+}
+.keyword-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* --- 基础标签样式（新增过渡和鼠标小手） --- */
+.keyword-tags .tag {
+    background: rgba(0, 234, 255, 0.1);
+    border: 1px solid #00eaff;
+    color: #00eaff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: default; /* 鼠标放上去变成小手 */
+    transition: all 0.3s ease; /* 关键：让所有变化（颜色、发光、位移）都平滑过渡 */
+}
+
+/* --- 新增：标签的 Hover 动态发光效果 --- */
+.keyword-tags .tag:hover {
+    background: rgba(0, 234, 255, 0.3); /* 背景变亮一点 */
+    color: #ffffff; /* 字体变成纯白，更加醒目 */
+    box-shadow: 0 0 10px rgba(0, 234, 255, 0.5); /* 像底部按钮一样的外发光特效 */
+    transform: translateY(-2px); /* 微微向上浮动 2px，物理反馈感拉满 */
+}
+/* 底部按钮 */
+.next-video-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid #ff2a6d;
+    color: #ff2a6d;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.next-video-btn:hover {
+    background: rgba(255, 42, 109, 0.1);
+    box-shadow: 0 0 10px rgba(255, 42, 109, 0.3);
+}
