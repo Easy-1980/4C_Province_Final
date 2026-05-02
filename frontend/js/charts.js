@@ -320,7 +320,7 @@ function updateLeftTopChart(provinceName, data) {
             bottom: '12%', // 把上面这一行往上抬（具体数值可微调，比如 8% 或 10%）
             silent: true, // 禁用点击
             style: {
-                text: `{label|剧种数: } {value|${operaCount} 个}          {label|传播热度: } {value|${avgScore.toFixed(1)}}`,
+                text: `{label|剧种数: } {value|${operaCount} 个}          {label|综合评分: } {value|${avgScore.toFixed(1)}}`,
                 textAlign: 'center',
                 rich: {
                     label: { fill: '#8b9baf', fontSize: 11 },
