@@ -166,24 +166,40 @@ const expandLabelsFromCountMap = (countMap) => {
 };
 
 const buildOperaObjects = (provinceData) => {
-    const rawNames = Array.isArray(provinceData && provinceData.operas) ? provinceData.operas : [];
-    const operaNames = rawNames
-        .map(name => String(name || '').trim())
-        .filter(Boolean);
-    if (!operaNames.length) return [];
+    const rawOperas = Array.isArray(provinceData && provinceData.operas)
+        ? provinceData.operas
+        : [];
+
+    if (!rawOperas.length) return [];
 
     const dynastyPool = expandLabelsFromCountMap(provinceData && provinceData.originDynasty);
     const levelPool = expandLabelsFromCountMap(provinceData && provinceData.heritageLevel);
-    return operaNames.map((name, index) => {
+
+    return rawOperas.map((op, index) => {
+        if (op && typeof op === 'object') {
+            const name = String(op.name || '').trim();
+            const dynasty = String(op.dynasty || op.originDynasty || '未知');
+            const level = String(op.level || op.heritageLevel || '未计入');
+
+            return {
+                name,
+                dynasty,
+                dynastyBucket: dynasty,
+                level
+            };
+        }
+
+        const name = String(op || '').trim();
         const dynasty = dynastyPool.length ? dynastyPool[index % dynastyPool.length] : '未知';
         const level = levelPool.length ? levelPool[index % levelPool.length] : '未计入';
+
         return {
-            name: name,
-            dynasty: dynasty,
+            name,
+            dynasty,
             dynastyBucket: dynasty,
-            level: level
+            level
         };
-    });
+    }).filter(item => item.name);
 };
 
 const buildLegacyDanmakuTrend = (video) => {

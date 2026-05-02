@@ -520,33 +520,53 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function buildAllOperas(dashboardData) {
-        const provinces = dashboardData && dashboardData.provinces && typeof dashboardData.provinces === 'object'
-            ? dashboardData.provinces
+    const provinces = dashboardData && dashboardData.provinces && typeof dashboardData.provinces === 'object'
+        ? dashboardData.provinces
+        : {};
+
+    const flat = [];
+
+    Object.keys(provinces).forEach(provinceName => {
+        const raw = provinces[provinceName] && typeof provinces[provinceName] === 'object'
+            ? provinces[provinceName]
             : {};
-        const flat = [];
 
-        Object.keys(provinces).forEach(provinceName => {
-            const raw = provinces[provinceName] && typeof provinces[provinceName] === 'object'
-                ? provinces[provinceName]
-                : {};
-            const names = Array.isArray(raw.operas)
-                ? raw.operas.map(v => String(v || '').trim()).filter(Boolean)
-                : [];
-            if (!names.length) return;
+        const rawOperas = Array.isArray(raw.operas) ? raw.operas : [];
 
-            const dynastyPool = expandLabels(raw.originDynasty);
-            const levelPool = expandLabels(raw.heritageLevel);
+        const dynastyPool = expandLabels(raw.originDynasty);
+        const levelPool = expandLabels(raw.heritageLevel);
 
-            names.forEach((name, idx) => {
-                const dynasty = dynastyPool.length ? dynastyPool[idx % dynastyPool.length] : '未知';
-                const level = levelPool.length ? levelPool[idx % levelPool.length] : '未计入';
-                const searchKey = `${name} ${dynasty} ${level}`.toLowerCase();
-                flat.push({ name, dynasty, level, searchKey, province: provinceName });
+        rawOperas.forEach((op, idx) => {
+            let name = '';
+            let dynasty = '';
+            let level = '';
+
+            if (op && typeof op === 'object') {
+                name = String(op.name || '').trim();
+                dynasty = String(op.dynasty || op.originDynasty || '未知').trim();
+                level = String(op.level || op.heritageLevel || '未计入').trim();
+            } else {
+                name = String(op || '').trim();
+                dynasty = dynastyPool.length ? dynastyPool[idx % dynastyPool.length] : '未知';
+                level = levelPool.length ? levelPool[idx % levelPool.length] : '未计入';
+            }
+
+            if (!name) return;
+
+            const searchKey = `${name} ${dynasty} ${level} ${provinceName}`.toLowerCase();
+
+            flat.push({
+                name,
+                dynasty,
+                level,
+                searchKey,
+                province: provinceName
             });
         });
+    });
 
-        return flat;
-    }
+    return flat;
+}
 
     function renderOperaList(data) {
         if (!Array.isArray(data) || data.length === 0) {

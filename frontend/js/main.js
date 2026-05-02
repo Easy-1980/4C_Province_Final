@@ -18,9 +18,11 @@ const fetchJsonWithFallback = async (paths) => {
 Promise.all([
     fetchJsonWithFallback([
         'data/dashboard_data.json',
+        '../data/dashboard_data.json?v=20260502'
     ]),
     fetchJsonWithFallback([
         'data/video_analysis.json',
+        '../data/video_analysis.json?v=20260502'
     ]),
     fetch('data/China.geojson').then(res => res.json())
 ]).then(([dashboardData, videoAnalysisData, geoJson]) => {
