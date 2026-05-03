@@ -449,7 +449,7 @@ function renderMap(geoJson) {
         }
         if (count > maxOperaCount) maxOperaCount = count;
     });
-    const requiredZeroScatterProvinces = ['青海', '西藏', '台湾'];
+    const requiredZeroScatterProvinces = ['青海', '西藏', '台湾','香港'];
     const existedScatterNames = new Set(globalScatterData.map(item => item && item.name).filter(Boolean));
     requiredZeroScatterProvinces.forEach(name => {
         if (existedScatterNames.has(name)) return;
